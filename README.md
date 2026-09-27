@@ -42,6 +42,12 @@ O objetivo principal da aplicação foi organizar a grade de cursos de idiomas (
 
 ---
 
+## 🖼️ Preview do Projeto
+
+<div align="center">
+  <img src="https://github.com/renansiebert7/prodigyschool/blob/master/assets/DESIGN%20READ.ME%20GIT%20HUB%20-%20PRODIGY.png?raw=true" alt="Preview Portfólio Renan Siebert" width="100%">
+</div>
+
 ## 🌐 Link de Acesso
 
 O site está no ar e pode ser visitado através do link oficial:
