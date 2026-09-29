@@ -600,6 +600,58 @@ h1, h2, h3, h4 { font-weight: 700; margin-bottom: 10px; letter-spacing: -0.01em;
 
 .lightbox .close:hover { opacity: 0.7; }
 
+
+/* ===================================================================
+   LIGHTBOX — setas de navegação
+   =================================================================== */
+.lightbox-img {
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+}
+
+.lightbox-img:active {
+    cursor: grabbing;
+}
+
+.lightbox-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.lightbox-arrow:hover {
+    background: var(--primary);
+    transform: translateY(-50%) scale(1.08);
+}
+
+.lightbox-prev { left: 20px; }
+.lightbox-next { right: 20px; }
+
+@media (max-width: 600px) {
+    .lightbox-arrow {
+        width: 42px;
+        height: 42px;
+        font-size: 1rem;
+    }
+
+    .lightbox-prev { left: 10px; }
+    .lightbox-next { right: 10px; }
+}
+
 /* ===================================================================
    DEPOIMENTOS & FAQ
    =================================================================== */
