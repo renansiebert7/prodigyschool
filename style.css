@@ -648,8 +648,8 @@ h1, h2, h3, h4 { font-weight: 700; margin-bottom: 10px; letter-spacing: -0.01em;
         font-size: 1rem;
     }
 
-    .lightbox-prev { left: 10px; }
-    .lightbox-next { right: 10px; }
+    .lightbox-prev { left: 10px; z-index: 1; }
+    .lightbox-next { right: 10px; z-index: 1; }
 }
 
 /* ===================================================================
