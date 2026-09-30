@@ -363,24 +363,117 @@ document.addEventListener("DOMContentLoaded", () => {
     alvos.forEach(el => observer.observe(el));
 });
 
+
 /* =========================================================
-   FORMULÁRIO DE CONTATO -> planilha + WhatsApp
+   VALIDAÇÃO + MÁSCARA + ENVIO DO FORMULÁRIO DE CONTATO
    ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("formContato");
     if (!form) return;
 
+    const campoNome = document.getElementById("nome");
+    const campoTelefone = document.getElementById("telefone");
+    const erroNome = document.getElementById("erro-nome");
+    const erroTelefone = document.getElementById("erro-telefone");
+
     const URL_PLANILHA = "https://script.google.com/macros/s/AKfycbxKERebJEW8EXucy5ULalyhPE1uKv5O_X4Ml9hU5ZbqF4xGazK9zD5rgD_zEUODet4KOA/exec";
 
+    /* ---------------------------------------------------------
+       VALIDAÇÃO DE NOME
+       Exige nome completo (2+ palavras), só letras e acentos,
+       cada palavra com pelo menos 2 caracteres.
+       --------------------------------------------------------- */
+    function validarNome(valor) {
+        const nome = valor.trim().replace(/\s+/g, " ");
+        const regexNomeCompleto = /^[A-Za-zÀ-ÖØ-öø-ÿ]{2,}(\s[A-Za-zÀ-ÖØ-öø-ÿ]{2,})+$/;
+
+        if (!nome) return "Digite seu nome completo.";
+        if (!regexNomeCompleto.test(nome)) return "Digite nome e sobrenome, sem números ou símbolos.";
+        return null; // válido
+    }
+
+    /* ---------------------------------------------------------
+       MÁSCARA + VALIDAÇÃO DE TELEFONE (padrão brasileiro)
+       Aceita 10 dígitos (fixo, com DDD) ou 11 (celular, com DDD e 9).
+       --------------------------------------------------------- */
+    function aplicarMascaraTelefone(valor) {
+        const digitos = valor.replace(/\D/g, "").slice(0, 11);
+
+        if (digitos.length <= 2) return digitos;
+        if (digitos.length <= 6) return `(${digitos.slice(0, 2)}) ${digitos.slice(2)}`;
+        if (digitos.length <= 10) return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 6)}-${digitos.slice(6)}`;
+        return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`;
+    }
+
+    function validarTelefone(valor) {
+        const digitos = valor.replace(/\D/g, "");
+        const ddd = parseInt(digitos.slice(0, 2), 10);
+
+        if (!digitos) return "Digite seu telefone com DDD.";
+        if (digitos.length < 10 || digitos.length > 11) return "Telefone incompleto. Use o formato (51) 99999-9999.";
+        if (ddd < 11 || ddd > 99) return "DDD inválido.";
+        if (digitos.length === 11 && digitos[2] !== "9") return "Celular deve começar com 9 depois do DDD.";
+        return null; // válido
+    }
+
+    /* ---------------------------------------------------------
+       Exibir / esconder mensagens de erro
+       --------------------------------------------------------- */
+    function mostrarErro(campo, elementoErro, mensagem) {
+        campo.classList.toggle("campo-invalido", !!mensagem);
+        elementoErro.textContent = mensagem || "";
+        elementoErro.classList.toggle("visivel", !!mensagem);
+    }
+
+    // Máscara aplicada enquanto digita
+    campoTelefone.addEventListener("input", () => {
+        campoTelefone.value = aplicarMascaraTelefone(campoTelefone.value);
+    });
+
+    // Validação em tempo real ao sair do campo (blur)
+    campoNome.addEventListener("blur", () => {
+        mostrarErro(campoNome, erroNome, validarNome(campoNome.value));
+    });
+
+    campoTelefone.addEventListener("blur", () => {
+        mostrarErro(campoTelefone, erroTelefone, validarTelefone(campoTelefone.value));
+    });
+
+    // Remove o erro assim que a pessoa começa a corrigir
+    campoNome.addEventListener("input", () => {
+        if (campoNome.classList.contains("campo-invalido")) {
+            mostrarErro(campoNome, erroNome, validarNome(campoNome.value));
+        }
+    });
+
+    campoTelefone.addEventListener("input", () => {
+        if (campoTelefone.classList.contains("campo-invalido")) {
+            mostrarErro(campoTelefone, erroTelefone, validarTelefone(campoTelefone.value));
+        }
+    });
+
+    /* ---------------------------------------------------------
+       ENVIO DO FORMULÁRIO
+       --------------------------------------------------------- */
     form.addEventListener("submit", function (e) {
         e.preventDefault();
+
+        const erroDoNome = validarNome(campoNome.value);
+        const erroDoTelefone = validarTelefone(campoTelefone.value);
+
+        mostrarErro(campoNome, erroNome, erroDoNome);
+        mostrarErro(campoTelefone, erroTelefone, erroDoTelefone);
+
+        // Se algum campo estiver inválido, para o envio e foca no primeiro problema
+        if (erroDoNome) return campoNome.focus();
+        if (erroDoTelefone) return campoTelefone.focus();
 
         const submitBtn = form.querySelector("button");
         const textoOriginal = submitBtn.innerText;
         submitBtn.innerText = "Enviando...";
         submitBtn.disabled = true;
 
-        const nome = document.getElementById("nome").value;
+        const nome = campoNome.value.trim();
         const idioma = document.getElementById("idioma").value;
         const mensagem = document.getElementById("mensagem").value;
 
@@ -390,7 +483,12 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(() => {
                 const textoWhats = `Olá! Meu nome é ${nome}. Tenho interesse no curso de ${idioma}. ${mensagem}`;
                 const linkWhats = `https://wa.me/555197692906?text=${encodeURIComponent(textoWhats)}`;
-                window.location.href = linkWhats;
+
+                window.open(linkWhats, "_blank", "noopener,noreferrer");
+
+                submitBtn.disabled = false;
+                submitBtn.innerText = textoOriginal;
+                form.reset();
             })
             .catch(error => {
                 alert("Erro ao salvar dados. Tente novamente.");
