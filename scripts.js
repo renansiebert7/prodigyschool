@@ -416,21 +416,16 @@ document.addEventListener("DOMContentLoaded", () => {
         return null; // válido
     }
 
-    /* ---------------------------------------------------------
-       Exibir / esconder mensagens de erro
-       --------------------------------------------------------- */
     function mostrarErro(campo, elementoErro, mensagem) {
         campo.classList.toggle("campo-invalido", !!mensagem);
         elementoErro.textContent = mensagem || "";
         elementoErro.classList.toggle("visivel", !!mensagem);
     }
 
-    // Máscara aplicada enquanto digita
     campoTelefone.addEventListener("input", () => {
         campoTelefone.value = aplicarMascaraTelefone(campoTelefone.value);
     });
 
-    // Validação em tempo real ao sair do campo (blur)
     campoNome.addEventListener("blur", () => {
         mostrarErro(campoNome, erroNome, validarNome(campoNome.value));
     });
@@ -439,7 +434,6 @@ document.addEventListener("DOMContentLoaded", () => {
         mostrarErro(campoTelefone, erroTelefone, validarTelefone(campoTelefone.value));
     });
 
-    // Remove o erro assim que a pessoa começa a corrigir
     campoNome.addEventListener("input", () => {
         if (campoNome.classList.contains("campo-invalido")) {
             mostrarErro(campoNome, erroNome, validarNome(campoNome.value));
@@ -464,7 +458,6 @@ document.addEventListener("DOMContentLoaded", () => {
         mostrarErro(campoNome, erroNome, erroDoNome);
         mostrarErro(campoTelefone, erroTelefone, erroDoTelefone);
 
-        // Se algum campo estiver inválido, para o envio e foca no primeiro problema
         if (erroDoNome) return campoNome.focus();
         if (erroDoTelefone) return campoTelefone.focus();
 
